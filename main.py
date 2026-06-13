@@ -23,7 +23,9 @@ CONFIG_PATH = Path(__file__).parent / "config" / "sources.yaml"
 
 
 def _require_env(name: str) -> str:
-    val = os.environ.get(name)
+    # GitHub Secret 등록 과정에서 trailing \n이나 BOM이 섞일 수 있어 강하게 정제한다.
+    raw = os.environ.get(name, "")
+    val = raw.lstrip("﻿").strip()
     if not val:
         log.error("환경변수 %s 가 설정되지 않았습니다.", name)
         sys.exit(1)
