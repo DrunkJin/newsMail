@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 import re
+import socket
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -11,6 +12,9 @@ from typing import Iterable
 
 import feedparser
 from dateutil import parser as dateparser
+
+# 전체 socket I/O에 timeout을 강제 — 응답 없는 RSS 서버 hang 방지.
+socket.setdefaulttimeout(15)
 
 log = logging.getLogger(__name__)
 

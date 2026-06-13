@@ -40,9 +40,12 @@ def _format_articles(articles: Sequence[Article]) -> str:
     return "\n".join(lines)
 
 
+_REQUEST_TIMEOUT_SEC = 60  # 카테고리당 최대 대기. 초과 시 fallback으로 넘김.
+
+
 def _try_model(model_name: str, prompt: str) -> str:
     model = genai.GenerativeModel(model_name)
-    resp = model.generate_content(prompt)
+    resp = model.generate_content(prompt, request_options={"timeout": _REQUEST_TIMEOUT_SEC})
     text = (resp.text or "").strip()
     if not text:
         raise RuntimeError(f"{model_name} returned empty text")

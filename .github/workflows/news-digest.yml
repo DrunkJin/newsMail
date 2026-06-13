@@ -14,7 +14,7 @@ concurrency:
 jobs:
   send-digest:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     env:
       TZ: Asia/Seoul
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
