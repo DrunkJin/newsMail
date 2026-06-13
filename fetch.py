@@ -41,6 +41,14 @@ def _is_google_news(url: str) -> bool:
     return "news.google.com" in url
 
 
+_HOSTNAME_RE = re.compile(r"^[\w-]+(\.[\w-]+)+$")
+
+
+def _looks_like_hostname(s: str) -> bool:
+    """`v.daum.net`, `news.naver.com` 같은 도메인 형태 판별."""
+    return bool(_HOSTNAME_RE.match(s.strip()))
+
+
 def _extract_google_news_source(entry, default_source: str, title: str) -> tuple[str, str]:
     """Google News entry에서 진짜 매체명을 추출하고 제목에서 접미사를 제거한다.
 
@@ -48,7 +56,7 @@ def _extract_google_news_source(entry, default_source: str, title: str) -> tuple
     """
     real_source = ""
 
-    # 1순위: entry.source 요소 (<source>매체명</source>)
+    # 1순위: entry.source 요소 — 단, 도메인 형태(v.daum.net 등)면 매체명 아님으로 처리
     src_obj = entry.get("source")
     if src_obj:
         if isinstance(src_obj, dict):
@@ -57,14 +65,16 @@ def _extract_google_news_source(entry, default_source: str, title: str) -> tuple
             real_source = _clean(getattr(src_obj, "title", ""))
         elif isinstance(src_obj, str):
             real_source = _clean(src_obj)
+    if real_source and _looks_like_hostname(real_source):
+        real_source = ""
 
     # 2순위: 제목 접미사 " - 매체명" 파싱
     if not real_source:
         m = re.search(r"\s+-\s+([^-\n]+?)\s*$", title)
         if m:
             candidate = m.group(1).strip()
-            # 너무 길거나 비정상이면 매체명 아닐 가능성 — 30자 이내만 채택
-            if 0 < len(candidate) <= 30:
+            # 길이 적정 + 도메인 아닌 경우만 채택
+            if 0 < len(candidate) <= 30 and not _looks_like_hostname(candidate):
                 real_source = candidate
 
     # 추출에 성공했으면 제목 끝의 " - 매체명" 접미사 제거 (dedup·표시 모두에 유리)
