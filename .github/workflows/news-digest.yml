@@ -1,0 +1,40 @@
+name: 뉴스 다이제스트 발송
+
+on:
+  schedule:
+    # GitHub Actions cron은 UTC 기준입니다.
+    - cron: '0 22 * * *'   # 22:00 UTC = 07:00 KST (다음날)
+    - cron: '0 8 * * *'    # 08:00 UTC = 17:00 KST
+  workflow_dispatch:       # 수동 실행 허용
+
+concurrency:
+  group: news-digest
+  cancel-in-progress: false
+
+jobs:
+  send-digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TZ: Asia/Seoul
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GMAIL_USER: ${{ secrets.GMAIL_USER }}
+      GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+      MAIL_RECIPIENT: ${{ secrets.MAIL_RECIPIENT }}
+    steps:
+      - name: 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Python 셋업
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 의존성 설치
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 뉴스 다이제스트 실행
+        run: python main.py

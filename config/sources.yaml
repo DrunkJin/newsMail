@@ -1,0 +1,61 @@
+# 뉴스 소스 설정 — 카테고리별 RSS 피드
+# 추가/제거하려면 이 파일만 수정하면 됩니다.
+# RSS URL은 시간이 지나면 변경될 수 있으므로 작동 안 하면 해당 언론사 RSS 페이지에서 확인 후 갱신하세요.
+
+# 기사 수집 시간 범위 (시간 단위) — 발송 직전 N시간 내 기사만 수집
+lookback_hours: 12
+
+# 카테고리당 요약에 사용할 최대 기사 수 (너무 많으면 토큰 낭비)
+max_articles_per_category: 30
+
+categories:
+  정치:
+    sources:
+      - name: 연합뉴스
+        url: https://www.yna.co.kr/rss/politics.xml
+      - name: 한겨레
+        url: https://www.hani.co.kr/rss/politics/
+      - name: 경향신문
+        url: https://www.khan.co.kr/rss/rssdata/politic_news.xml
+
+  경제:
+    sources:
+      - name: 연합뉴스
+        url: https://www.yna.co.kr/rss/economy.xml
+      - name: 매일경제
+        url: https://www.mk.co.kr/rss/30100041/
+      - name: 한국경제
+        url: https://www.hankyung.com/feed/economy
+      - name: BBC Business
+        url: http://feeds.bbci.co.uk/news/business/rss.xml
+
+  사회:
+    sources:
+      - name: 연합뉴스
+        url: https://www.yna.co.kr/rss/society.xml
+      - name: 한겨레
+        url: https://www.hani.co.kr/rss/society/
+      - name: 경향신문
+        url: https://www.khan.co.kr/rss/rssdata/society_news.xml
+
+  IT_과학:
+    sources:
+      - name: 전자신문
+        url: https://rss.etnews.com/Section901.xml
+      - name: ZDNet Korea
+        url: https://feeds.feedburner.com/zdkorea
+      - name: 한겨레 과학
+        url: https://www.hani.co.kr/rss/science/
+      - name: BBC Technology
+        url: http://feeds.bbci.co.uk/news/technology/rss.xml
+
+  국제:
+    sources:
+      - name: 연합뉴스
+        url: https://www.yna.co.kr/rss/international.xml
+      - name: 한겨레
+        url: https://www.hani.co.kr/rss/international/
+      - name: BBC World
+        url: http://feeds.bbci.co.uk/news/world/rss.xml
+      - name: BBC Asia
+        url: http://feeds.bbci.co.uk/news/world/asia/rss.xml
