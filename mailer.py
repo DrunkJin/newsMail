@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import re
 import smtplib
 from datetime import datetime, timedelta, timezone
 from email.message import EmailMessage
@@ -24,20 +25,84 @@ def _subject(now: datetime) -> str:
     return f"[뉴스다이제스트] {now:%Y.%m.%d} ({wd}) {slot}"
 
 
-def _bullets_to_html(text: str) -> str:
-    """요약 텍스트를 <ul><li> HTML로 변환."""
-    lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
-    items = []
-    for ln in lines:
-        if ln.startswith(("•", "-", "*")):
-            ln = ln.lstrip("•-* ").strip()
-            items.append(f"<li>{_escape(ln)}</li>")
+_BULLET_RE = re.compile(r'^[•*\-]\s+')
+_BOLD_RE = re.compile(r'\*\*([^*]+)\*\*')
+_SOURCE_RE = re.compile(r'\s*\(?\s*출처\s*[:：]\s*([^)]+?)\)?\s*$')
+
+
+def _strip_source(s: str) -> tuple[str, str]:
+    """문자열 끝의 (출처: …)를 추출. (본문만, 출처문자열) 반환."""
+    m = _SOURCE_RE.search(s)
+    if m:
+        return s[:m.start()].strip(), f"출처: {m.group(1).strip()}"
+    return s, ""
+
+
+def _parse_summary(text: str) -> list[dict]:
+    """요약 텍스트를 [{'headline','body','source'}, ...] 리스트로 파싱."""
+    items: list[dict] = []
+    current: dict | None = None
+
+    for raw in text.splitlines():
+        ln = raw.strip()
+        if not ln:
+            continue
+        if _BULLET_RE.match(ln):
+            if current:
+                items.append(current)
+            headline = _BULLET_RE.sub("", ln)
+            headline = _BOLD_RE.sub(r"\1", headline).strip()
+            headline, src = _strip_source(headline)
+            current = {"headline": headline, "body": [], "source": src}
+        elif ln.startswith("(출처") or ln.startswith("출처:") or ln.startswith("출처 "):
+            if current:
+                _, src = _strip_source(ln if ln.startswith("(") else f"({ln})")
+                current["source"] = src or ln.strip("()")
         else:
-            # bullet이 아닌 경우 그대로 단락으로
-            items.append(f"<li>{_escape(ln)}</li>")
+            line_text, src = _strip_source(ln)
+            if current:
+                if line_text:
+                    current["body"].append(line_text)
+                if src and not current["source"]:
+                    current["source"] = src
+    if current:
+        items.append(current)
+    return items
+
+
+def _bullets_to_html(text: str) -> str:
+    """구조화된 요약을 헤드라인+본문+출처 HTML로 변환."""
+    items = _parse_summary(text)
     if not items:
         return f"<p>{_escape(text)}</p>"
-    return "<ul style='padding-left:20px;margin:8px 0;'>" + "".join(items) + "</ul>"
+
+    html_items = []
+    for it in items:
+        body = " ".join(it["body"]).strip()
+        parts = []
+        if it["headline"]:
+            parts.append(
+                f"<div style='font-weight:600;color:#1a1a1a;font-size:15px;"
+                f"margin-bottom:5px;line-height:1.4;'>{_escape(it['headline'])}</div>"
+            )
+        if body:
+            parts.append(
+                f"<div style='color:#333;line-height:1.65;font-size:14px;'>"
+                f"{_escape(body)}</div>"
+            )
+        if it["source"]:
+            parts.append(
+                f"<div style='margin-top:5px;color:#888;font-size:12px;'>"
+                f"{_escape(it['source'])}</div>"
+            )
+        html_items.append(
+            f"<li style='margin-bottom:18px;padding-left:4px;'>"
+            + "".join(parts) + "</li>"
+        )
+    return (
+        "<ul style='padding-left:20px;margin:10px 0;'>"
+        + "".join(html_items) + "</ul>"
+    )
 
 
 def _escape(s: str) -> str:
