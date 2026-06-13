@@ -17,6 +17,8 @@ categories:
         url: https://www.hani.co.kr/rss/politics/
       - name: 경향신문
         url: https://www.khan.co.kr/rss/rssdata/politic_news.xml
+      - name: 구글 뉴스
+        url: "https://news.google.com/rss/search?q=%EC%A0%95%EC%B9%98+when:12h&hl=ko&gl=KR&ceid=KR:ko"
 
   경제:
     sources:
@@ -28,6 +30,8 @@ categories:
         url: https://www.hankyung.com/feed/economy
       - name: BBC Business
         url: http://feeds.bbci.co.uk/news/business/rss.xml
+      - name: 구글 뉴스
+        url: "https://news.google.com/rss/search?q=%EA%B2%BD%EC%A0%9C+when:12h&hl=ko&gl=KR&ceid=KR:ko"
 
   사회:
     sources:
@@ -37,6 +41,8 @@ categories:
         url: https://www.hani.co.kr/rss/society/
       - name: 경향신문
         url: https://www.khan.co.kr/rss/rssdata/society_news.xml
+      - name: 구글 뉴스
+        url: "https://news.google.com/rss/search?q=%EC%82%AC%ED%9A%8C+when:12h&hl=ko&gl=KR&ceid=KR:ko"
 
   IT_과학:
     sources:
@@ -48,6 +54,8 @@ categories:
         url: https://www.hani.co.kr/rss/science/
       - name: BBC Technology
         url: http://feeds.bbci.co.uk/news/technology/rss.xml
+      - name: 구글 뉴스
+        url: "https://news.google.com/rss/search?q=IT+OR+AI+OR+%EB%B0%98%EB%8F%84%EC%B2%B4+when:12h&hl=ko&gl=KR&ceid=KR:ko"
 
   국제:
     sources:
@@ -59,3 +67,5 @@ categories:
         url: http://feeds.bbci.co.uk/news/world/rss.xml
       - name: BBC Asia
         url: http://feeds.bbci.co.uk/news/world/asia/rss.xml
+      - name: 구글 뉴스
+        url: "https://news.google.com/rss/search?q=%EA%B5%AD%EC%A0%9C+OR+%EC%84%B8%EA%B3%84+when:12h&hl=ko&gl=KR&ceid=KR:ko"
